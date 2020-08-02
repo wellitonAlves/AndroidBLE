@@ -63,6 +63,24 @@ public class BluetoothLeService extends Service {
     public final static UUID UUID_HEART_RATE_MEASUREMENT =
             UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
 
+    public void writeCharacteristic(BluetoothGatt gatt) {
+
+       // characteristic = new BluetoothGattCharacteristic(UUID_HEART_RATE_MEASUREMENT,mConnectionState,mConnectionState);
+
+       // for (BluetoothGattService service : gatt.getServices()) {
+            BluetoothGattService service = gatt.getService(UUID_HEART_RATE_MEASUREMENT);
+            BluetoothGattCharacteristic characteristic = service.getCharacteristic(UUID_HEART_RATE_MEASUREMENT);
+            Log.i(TAG,"***try to send message "+UUID_HEART_RATE_MEASUREMENT);
+            if (characteristic != null) {
+                Log.i(TAG,"###try to send message "+UUID_HEART_RATE_MEASUREMENT);
+                byte[] value = new byte[]{'a'};
+                characteristic.setValue(value);
+                gatt.writeCharacteristic(characteristic);
+            }
+  //      }
+
+    }
+
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -72,6 +90,8 @@ public class BluetoothLeService extends Service {
                 mConnectionState = STATE_CONNECTED;
                 broadcastUpdate(intentAction);
                 Log.i(TAG, "Connected to GATT server.");
+
+            //   writeCharacteristic(gatt);
                 // Attempts to discover services after successful connection.
                 Log.i(TAG, "Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
@@ -244,7 +264,11 @@ public class BluetoothLeService extends Service {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;
         }
+        //https://www.polidea.com/blog/Emberlight_turns_light_bulbs_into_smart_ones/
         mBluetoothGatt.readCharacteristic(characteristic);
+        byte[] value = new byte[]{'a'};
+        characteristic.setValue(value);
+        mBluetoothGatt.writeCharacteristic(characteristic);
     }
 
 
